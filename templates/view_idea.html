@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ idea.title }}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-light mb-4">{{ idea.title }}</h1>
+    <p class="text-light">{{ idea.description }}</p>
+    <p class="text-light"><strong>Kategorija:</strong> {{ idea.category }}</p>
+    <p class="text-light"><strong>Autors:</strong> {{ idea.user.username }} on {{ idea.date_posted.strftime('%Y-%m-%d') }}</p>
+
+    <hr class="bg-light">
+    <h2 class="text-light">Balsošanas opcijas</h2>
+    {% if current_user.role == 'creator' %}
+        {% if not has_voted %}
+            <form action="{{ url_for('view_idea', idea_id=idea.id) }}" method="POST">
+                {{ comment_form.hidden_tag() }}
+                {% for option in voting_options %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="voting_option" id="option{{ option.id }}" value="{{ option.id }}">
+                        <label class="form-check-label text-light" for="option{{ option.id }}">
+                            {{ option.option_text }} ({{ option.votes }} votes)
+                        </label>
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary mt-3">Vote</button>
+            </form>
+        {% else %}
+            <p class="text-light">Jūs jau esat balsojis par šo ideju.</p>
+        {% endif %}
+    {% else %}
+        <p class="text-light">Balsošana ir pieejama tikai raditājiem</p>
+    {% endif %}
+
+    <hr class="bg-light">
+    <h2 class="text-light">Balsošanas rezultāti</h2>
+    <canvas id="votingResultsChart"></canvas>
+
+    {% if current_user.role == 'creator' %}
+        <form action="{{ url_for('like_idea', idea_id=idea.id) }}" method="POST" class="mt-3">
+            {{ like_form.hidden_tag() }}
+            <button type="submit" name="like_button" class="btn btn-success">Like</button>
+        </form>
+    {% else %}
+        <p class="text-light">Opcija tikai radītājiem.</p>
+    {% endif %}
+
+    <hr class="bg-light">
+    <h2 class="text-light">Comments</h2>
+    {% if current_user.role == 'creator' %}
+        <form action="{{ url_for('view_idea', idea_id=idea.id) }}" method="POST" class="mb-4">
+            {{ comment_form.hidden_tag() }}
+            <div class="form-group">
+                {{ comment_form.content.label(class="form-control-label text-light") }}
+                {{ comment_form.content(class="form-control") }}
+                {{ comment_form.parent_id(class="form-control", type="hidden", value=0) }}
+            </div>
+            <button type="submit" class="btn btn-primary">Add Comment</button>
+        </form>
+    {% else %}
+        <p class="text-light">Opcija tikai radītājiem.</p>
+    {% endif %}
+
+    <ul class="list-group">
+        {% for comment in comments %}
+            {% if not comment.parent_id %}
+                <li class="list-group-item bg-dark text-light">
+                    <p>{{ comment.content }} <br> <em>by {{ comment.user.username }} on {{ comment.date_posted.strftime('%Y-%m-%d %H:%M:%S') }}</em></p>
+                    {% if comment.user_id == current_user.id %}
+                        <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST" class="d-inline">
+                            {{ comment_form.hidden_tag() }}
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    {% endif %}
+                    <a href="#reply-{{ comment.id }}" data-toggle="collapse" aria-expanded="false" aria-controls="reply-{{ comment.id }}" class="text-light">Reply</a>
+                    
+                    <div class="collapse" id="reply-{{ comment.id }}">
+                        <form action="{{ url_for('reply_comment', comment_id=comment.id) }}" method="POST" class="mt-2">
+                            {{ comment_form.hidden_tag() }}
+                            <div class="form-group">
+                                {{ comment_form.content.label(class="form-control-label text-light") }}
+                                {{ comment_form.content(class="form-control") }}
+                                {{ comment_form.parent_id(class="form-control", type="hidden", value=comment.id) }}
+                            </div>
+                            <button type="submit" class="btn btn-primary">Reply</button>
+                        </form>
+                    </div>
+
+                    {% for reply in comment.replies %}
+                        <ul class="list-group mt-2 reply-list">
+                            <li class="list-group-item reply-item text-light">
+                                <p>{{ reply.content }} <br> <em>by {{ reply.user.username }} on {{ reply.date_posted.strftime('%Y-%m-%d %H:%M:%S') }}</em></p>
+                                {% if reply.user_id == current_user.id %}
+                                    <form action="{{ url_for('delete_comment', comment_id=reply.id) }}" method="POST" class="d-inline">
+                                        {{ comment_form.hidden_tag() }}
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    {% endfor %}
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('rang') }}" class="btn btn-secondary mt-4">Back to all ideas</a>
+</div>
+
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('votingResultsChart').getContext('2d');
+    const votingResultsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ voting_labels|tojson }},
+            datasets: [{
+                label: 'Votes',
+                data: {{ voting_votes|tojson }},
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

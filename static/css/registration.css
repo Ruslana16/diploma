@@ -1,0 +1,67 @@
+/* Base styles for the body to apply dark theme colors */
+body {
+    background-color: #23272A;
+    color: #ffffff;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Styling the container for the form to center it */
+.container {
+    width: 100%;
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #2C2F33;
+    border-radius: 8px;
+}
+
+/* Styles for form elements */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    color: #7289DA; /* Discord's bluish brand color for a bit of accent */
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #4F545C; /* Darker border for inputs */
+    border-radius: 4px;
+    background-color: #40444B;
+    color: #FFFFFF;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #7289DA;
+    background-color: #23272A;
+}
+
+/* Styling for submit button to make it stand out */
+.btn-primary {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #7289DA;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #5a6eaa;
+}
+
+/* Error message styling */
+.alert-danger {
+    color: #f04747;
+    font-size: 0.85em;
+    margin-top: 5px;
+}

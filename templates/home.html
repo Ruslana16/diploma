@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Balsu Vilnis
+    Jūsu balsij ir nozīme
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 text-center">
+    <h1 class="mb-4">Balsu Vilnis</h1>
+    <h2 class="mb-4">Jūsu balsij ir nozīme!</h2>
+
+    <p class="text-light">Šeit Jūs varat būt vai radītājs, vai novērotājs. Izvēlieties savu lomu un pievienojieties mums!</p>
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-4">
+            <div class="card bg-secondary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title text-light">Būt radītājam</h5>
+                    <p class="card-text text-light">Kā radītājs Jūs varēsiet veidot un dalīties ar savām idejām, kā arī saņemt atsauksmes no citiem lietotājiem.</p>
+                    <a href="{{ url_for('registration', role='creator') }}" class="btn btn-primary">Būt radītājam</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-secondary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title text-light">Būt novērotājam</h5>
+                    <p class="card-text text-light">Kā novērotājs Jūs varēsiet sekot līdzi radītāju darbībai, apskatīt idejas, komentārus un balsošanas rezultātus</p>
+                    <a href="{{ url_for('registration', role='observer') }}" class="btn btn-primary">Būt novērotājam</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+

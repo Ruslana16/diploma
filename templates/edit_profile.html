@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Labot profilu
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-light mb-4">Labot profilu</h1>
+    <form action="{{ url_for('edit_profile') }}" method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.username.label(class="text-light") }}
+            {{ form.username(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.email.label(class="text-light") }}
+            {{ form.email(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Atjaunināt profilu</button>
+    </form>
+</div>
+{% endblock %}

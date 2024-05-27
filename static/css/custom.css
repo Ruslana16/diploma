@@ -1,0 +1,46 @@
+body {
+    background-color: #2C2F33;  /* Dark background similar to Discord's dark mode */
+    color: #fff;  /* Light text for readability on dark backgrounds */
+}
+
+a, .btn-link {
+    color: #7289DA;  /* Discord's bluish accent color */
+}
+
+a:hover, .btn-link:hover {
+    color: #99AAB5;  /* Slightly lighter blue for hover effects */
+}
+
+.btn-primary {
+    background-color: #7289DA;
+    border-color: #7289DA;
+}
+
+.btn-primary:hover {
+    background-color: #99AAB5;
+    border-color: #99AAB5;
+}
+
+.card {
+    background-color: #23272A;  /* Cards with slightly different dark shade for layering effect */
+}
+
+.card .btn-info {
+    background-color: #5865F2; /* Brighter blue for primary actions */
+    border-color: #5865F2;
+}
+
+.card .btn-info:hover {
+    background-color: #4e5cd8;
+    border-color: #4e5cd8;
+}
+
+.card .btn-danger {
+    background-color: #ED4245; /* Discord red for delete buttons */
+    border-color: #ED4245;
+}
+
+.card .btn-danger:hover {
+    background-color: #d8393f;
+    border-color: #d8393f;
+}

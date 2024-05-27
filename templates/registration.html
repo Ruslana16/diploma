@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Pieteikties
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-light mb-4">Reģistrēties</h1>
+    <form method="POST" action="{{ url_for('registration', role=request.args.get('role')) }}">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.username.label(class="form-control-label text-light") }}
+            {{ form.username(class="form-control") }}
+        </div>
+        {% if request.args.get('role') == 'creator' %}
+        <div class="form-group">
+            {{ form.email.label(class="form-control-label text-light") }}
+            {{ form.email(class="form-control") }}
+        </div>
+        {% endif %}
+        <div class="form-group">
+            {{ form.password.label(class="form-control-label text-light") }}
+            {{ form.password(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.confirm_password.label(class="form-control-label text-light") }}
+            {{ form.confirm_password(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Sign Up</button>
+    </form>
+</div>
+{% endblock %}
+
+
+
+
+
+
