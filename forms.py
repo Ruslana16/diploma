@@ -3,6 +3,7 @@ from wtforms import StringField, PasswordField, SubmitField, SelectField, RadioF
 from wtforms.validators import DataRequired, Length, EqualTo, Email, Optional, ValidationError#
 from models import User
 from wtforms import StringField, TextAreaField, FieldList, FormField, SubmitField
+from flask_wtf import RecaptchaField
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', [
@@ -13,6 +14,8 @@ class RegistrationForm(FlaskForm):
         DataRequired(),
         EqualTo('confirm_password', message='Passwords must match')
     ])
+    recaptcha = RecaptchaField()
+    role = HiddenField('Role') 
     confirm_password = PasswordField('Confirm Password')
     
     # Email field is optional and added only if the role is creator

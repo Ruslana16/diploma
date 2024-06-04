@@ -1,31 +1,107 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Balsu Vilnis
-    Jūsu balsij ir nozīme
+    Balsu Vilnis - Jūsu balsij ir nozīme
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4 text-center">
-    <h1 class="mb-4">Balsu Vilnis</h1>
-    <h2 class="mb-4">Jūsu balsij ir nozīme!</h2>
+<style>
+    .hero-section {
+        background-color: #f8f9fa;
+        color: #000;
+        padding: 20px 0; /* Reduced padding */
+        text-align: center;
+    }
+    .hero-section h1 {
+        font-size: 4rem;
+        font-weight: 800;
+        margin-bottom: 15px; /* Adjusted margin */
+    }
+    .hero-section h2 {
+        font-size: 1.5rem; /* Reduced size */
+        margin-bottom: 10px; /* Adjusted margin */
+    }
+    .role-selection {
+        padding: 10px 0; /* Reduced padding */
+        border-radius: 10px;
+        margin-top: 10px; /* Reduced margin */
+    }
+    .role-card {
+        border: none;
+        border-radius: 10px;
+        transition: transform 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%; /* Ensure equal height */
+    }
+    .role-card-body {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .role-card:hover {
+        transform: translateY(-10px);
+    }
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+        font-size: 0.875rem; /* Restored smaller size */
+        padding: 0.5rem 1rem; /* Restored smaller padding */
+        width: auto; /* Button width adjusts to content */
+    }
+    .btn-primary:hover {
+        background-color: #4b4fee;
+        border-color: #4b4fee;
+    }
+    .btn-primary:focus, .btn-primary:active {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        color: #ffffff !important;
+    }
+    .bg-primary {
+        background-color: var(--primary-color) !important;
+    }
+    .navbar-dark {
+        background-color: var(--primary-color) !important;
+    }
+    .navbar-brand {
+        color: #fff !important;
+    }
+    .text-primary {
+        color: var(--primary-color) !important;
+    }
+</style>
 
-    <p class="text-light">Šeit Jūs varat būt vai radītājs, vai novērotājs. Izvēlieties savu lomu un pievienojieties mums!</p>
-    <div class="row justify-content-center mt-4">
-        <div class="col-md-4">
-            <div class="card bg-secondary mb-3">
-                <div class="card-body">
-                    <h5 class="card-title text-light">Būt radītājam</h5>
-                    <p class="card-text text-light">Kā radītājs Jūs varēsiet veidot un dalīties ar savām idejām, kā arī saņemt atsauksmes no citiem lietotājiem.</p>
+<div class="hero-section">
+    <h1 class="text-primary">Balsu Vilnis</h1>
+    <h2 class="text-secondary">Jūsu balsij ir nozīme!</h2>
+    <p class="lead">Šeit Jūs varat būt vai radītājs, vai novērotājs. Izvēlieties savu lomu un pievienojieties mums!</p>
+</div>
+
+<div class="container role-selection text-center">
+    <h2 class="mb-4 text-primary" style="font-size: 1.5rem;">Izvēlieties savu lomu un pievienojieties mums!</h2> <!-- Smaller font size -->
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card role-card shadow-sm">
+                <div class="card-body role-card-body">
+                    <div>
+                        <h5 class="card-title text-primary">Būt radītājam</h5>
+                        <p class="card-text text-dark">Kā radītājs Jūs varēsiet veidot un dalīties ar savām idejām, kā arī saņemt atsauksmes no citiem lietotājiem.</p>
+                    </div>
                     <a href="{{ url_for('registration', role='creator') }}" class="btn btn-primary">Būt radītājam</a>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card bg-secondary mb-3">
-                <div class="card-body">
-                    <h5 class="card-title text-light">Būt novērotājam</h5>
-                    <p class="card-text text-light">Kā novērotājs Jūs varēsiet sekot līdzi radītāju darbībai, apskatīt idejas, komentārus un balsošanas rezultātus</p>
+        <div class="col-md-5">
+            <div class="card role-card shadow-sm">
+                <div class="card-body role-card-body">
+                    <div>
+                        <h5 class="card-title text-primary">Būt novērotājam</h5>
+                        <p class="card-text text-dark">Kā novērotājs Jūs varēsiet sekot līdzi radītāju darbībai, apskatīt idejas, komentārus un balsošanas rezultātus.</p>
+                    </div>
                     <a href="{{ url_for('registration', role='observer') }}" class="btn btn-primary">Būt novērotājam</a>
                 </div>
             </div>
@@ -33,6 +109,26 @@
     </div>
 </div>
 {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

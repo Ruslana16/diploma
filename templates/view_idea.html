@@ -6,13 +6,13 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="text-light mb-4">{{ idea.title }}</h1>
-    <p class="text-light">{{ idea.description }}</p>
-    <p class="text-light"><strong>Kategorija:</strong> {{ idea.category }}</p>
-    <p class="text-light"><strong>Autors:</strong> {{ idea.user.username }} on {{ idea.date_posted.strftime('%Y-%m-%d') }}</p>
+    <h1 class="text-primary mb-4">{{ idea.title }}</h1>
+    <p class="text-dark">{{ idea.description }}</p>
+    <p class="text-dark"><strong>Kategorija:</strong> {{ idea.category }}</p>
+    <p class="text-dark"><strong>Autors:</strong> {{ idea.user.username }} on {{ idea.date_posted.strftime('%Y-%m-%d') }}</p>
 
-    <hr class="bg-light">
-    <h2 class="text-light">Balsošanas opcijas</h2>
+    <hr class="bg-dark">
+    <h2 class="text-primary">Balsošanas opcijas</h2>
     {% if current_user.role == 'creator' %}
         {% if not has_voted %}
             <form action="{{ url_for('view_idea', idea_id=idea.id) }}" method="POST">
@@ -20,7 +20,7 @@
                 {% for option in voting_options %}
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="voting_option" id="option{{ option.id }}" value="{{ option.id }}">
-                        <label class="form-check-label text-light" for="option{{ option.id }}">
+                        <label class="form-check-label text-dark" for="option{{ option.id }}">
                             {{ option.option_text }} ({{ option.votes }} votes)
                         </label>
                     </div>
@@ -28,14 +28,14 @@
                 <button type="submit" class="btn btn-primary mt-3">Vote</button>
             </form>
         {% else %}
-            <p class="text-light">Jūs jau esat balsojis par šo ideju.</p>
+            <p class="text-dark">Jūs jau esat balsojis par šo ideju.</p>
         {% endif %}
     {% else %}
-        <p class="text-light">Balsošana ir pieejama tikai raditājiem</p>
+        <p class="text-dark">Balsošana ir pieejama tikai raditājiem</p>
     {% endif %}
 
-    <hr class="bg-light">
-    <h2 class="text-light">Balsošanas rezultāti</h2>
+    <hr class="bg-dark">
+    <h2 class="text-primary">Balsošanas rezultāti</h2>
     <canvas id="votingResultsChart"></canvas>
 
     {% if current_user.role == 'creator' %}
@@ -44,29 +44,29 @@
             <button type="submit" name="like_button" class="btn btn-success">Like</button>
         </form>
     {% else %}
-        <p class="text-light">Opcija tikai radītājiem.</p>
+        <p class="text-dark">Opcija tikai radītājiem.</p>
     {% endif %}
 
-    <hr class="bg-light">
-    <h2 class="text-light">Comments</h2>
+    <hr class="bg-dark">
+    <h2 class="text-primary">Comments</h2>
     {% if current_user.role == 'creator' %}
         <form action="{{ url_for('view_idea', idea_id=idea.id) }}" method="POST" class="mb-4">
             {{ comment_form.hidden_tag() }}
             <div class="form-group">
-                {{ comment_form.content.label(class="form-control-label text-light") }}
+                {{ comment_form.content.label(class="form-control-label text-dark") }}
                 {{ comment_form.content(class="form-control") }}
                 {{ comment_form.parent_id(class="form-control", type="hidden", value=0) }}
             </div>
             <button type="submit" class="btn btn-primary">Add Comment</button>
         </form>
     {% else %}
-        <p class="text-light">Opcija tikai radītājiem.</p>
+        <p class="text-dark">Opcija tikai radītājiem.</p>
     {% endif %}
 
     <ul class="list-group">
         {% for comment in comments %}
             {% if not comment.parent_id %}
-                <li class="list-group-item bg-dark text-light">
+                <li class="list-group-item bg-light text-dark">
                     <p>{{ comment.content }} <br> <em>by {{ comment.user.username }} on {{ comment.date_posted.strftime('%Y-%m-%d %H:%M:%S') }}</em></p>
                     {% if comment.user_id == current_user.id %}
                         <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST" class="d-inline">
@@ -74,13 +74,13 @@
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>
                     {% endif %}
-                    <a href="#reply-{{ comment.id }}" data-toggle="collapse" aria-expanded="false" aria-controls="reply-{{ comment.id }}" class="text-light">Reply</a>
+                    <a href="#reply-{{ comment.id }}" data-toggle="collapse" aria-expanded="false" aria-controls="reply-{{ comment.id }}" class="text-dark">Reply</a>
                     
                     <div class="collapse" id="reply-{{ comment.id }}">
                         <form action="{{ url_for('reply_comment', comment_id=comment.id) }}" method="POST" class="mt-2">
                             {{ comment_form.hidden_tag() }}
                             <div class="form-group">
-                                {{ comment_form.content.label(class="form-control-label text-light") }}
+                                {{ comment_form.content.label(class="form-control-label text-dark") }}
                                 {{ comment_form.content(class="form-control") }}
                                 {{ comment_form.parent_id(class="form-control", type="hidden", value=comment.id) }}
                             </div>
@@ -90,7 +90,7 @@
 
                     {% for reply in comment.replies %}
                         <ul class="list-group mt-2 reply-list">
-                            <li class="list-group-item reply-item text-light">
+                            <li class="list-group-item reply-item text-dark">
                                 <p>{{ reply.content }} <br> <em>by {{ reply.user.username }} on {{ reply.date_posted.strftime('%Y-%m-%d %H:%M:%S') }}</em></p>
                                 {% if reply.user_id == current_user.id %}
                                     <form action="{{ url_for('delete_comment', comment_id=reply.id) }}" method="POST" class="d-inline">
@@ -135,6 +135,8 @@
     });
 </script>
 {% endblock %}
+
+
 
 
 

@@ -77,21 +77,24 @@ def register_routes(app):
     @app.route('/registration', methods=['GET', 'POST'])
     def registration():
         role = request.args.get('role')
-        form = RegistrationForm()
+        form = RegistrationForm(role=role)  # Pass role to form
 
+    # Adjust email validators based on role
         if role == 'creator':
-                form.email.validators = [DataRequired(), Email()]
+            form.email.validators = [DataRequired(), Email()]
         else:
-                form.email.validators = [Optional()]
+            form.email.validators = [Optional()]
 
         if form.validate_on_submit():
+        # Verify reCAPTCHA
+            if not form.recaptcha.errors:
                 email = form.email.data if role == 'creator' else None
                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
                 user = User(username=form.username.data, email=email, password=hashed_password, role=role, confirmed=False)
                 db.session.add(user)
                 db.session.commit()
 
-                # Automatically log the user in after registration
+            # Automatically log the user in after registration
                 login_user(user)
 
                 if user.email:
@@ -102,6 +105,8 @@ def register_routes(app):
 
                 flash('Thank you for registering! Please check your email for a confirmation link.', 'success')
                 return redirect(url_for('dashboard'))
+            else:
+                flash('Please complete the reCAPTCHA.', 'danger')
 
         return render_template('registration.html', title='Register', form=form, role=role)
 

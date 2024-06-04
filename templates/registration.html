@@ -1,36 +1,82 @@
 {% extends "base.html" %}
 
-{% block title %}
-    Pieteikties
-{% endblock %}
+{% block title %}Reģistrēties{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="text-light mb-4">Reģistrēties</h1>
-    <form method="POST" action="{{ url_for('registration', role=request.args.get('role')) }}">
+    <h1 class="text-dark mb-4">Reģistrēties</h1>
+    <form method="POST" action="{{ url_for('registration') }}">
         {{ form.hidden_tag() }}
         <div class="form-group">
-            {{ form.username.label(class="form-control-label text-light") }}
-            {{ form.username(class="form-control") }}
-        </div>
-        {% if request.args.get('role') == 'creator' %}
-        <div class="form-group">
-            {{ form.email.label(class="form-control-label text-light") }}
-            {{ form.email(class="form-control") }}
-        </div>
-        {% endif %}
-        <div class="form-group">
-            {{ form.password.label(class="form-control-label text-light") }}
-            {{ form.password(class="form-control") }}
+            <label for="username" class="text-dark">Lietotājvārds</label>
+            {{ form.username(class_="form-control", id="username") }}
+            {% if form.username.errors %}
+                <div class="text-danger">
+                    {% for error in form.username.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
         <div class="form-group">
-            {{ form.confirm_password.label(class="form-control-label text-light") }}
-            {{ form.confirm_password(class="form-control") }}
+            <label for="email" class="text-dark">Email</label>
+            {{ form.email(class_="form-control", id="email") }}
+            {% if form.email.errors %}
+                <div class="text-danger">
+                    {% for error in form.email.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
-        <button type="submit" class="btn btn-primary">Sign Up</button>
+        <div class="form-group">
+            <label for="password" class="text-dark">Password</label>
+            {{ form.password(class_="form-control", id="password") }}
+            {% if form.password.errors %}
+                <div class="text-danger">
+                    {% for error in form.password.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label for="confirm_password" class="text-dark">Confirm Password</label>
+            {{ form.confirm_password(class_="form-control", id="confirm_password") }}
+            {% if form.confirm_password.errors %}
+                <div class="text-danger">
+                    {% for error in form.confirm_password.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label class="text-dark">Role</label>
+            {{ form.role(class_="form-check-input", id="role") }}
+            {% if form.role.errors %}
+                <div class="text-danger">
+                    {% for error in form.role.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="g-recaptcha" data-sitekey="6LfQF_EpAAAAAJRD1RNayz0jOJrNzgGlMJN6G49Q"></div> <!-- Add this line -->
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-primary">Sign Up</button>
+        </div>
     </form>
 </div>
 {% endblock %}
+
+
+
+
+
+
+
+
 
 
 

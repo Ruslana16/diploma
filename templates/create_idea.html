@@ -6,26 +6,26 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="text-light mb-4">Izveidot ierosinājumu</h1>
+    <h1 class="mb-4">Izveidot ierosinājumu</h1>
     <form action="{{ url_for('create_idea') }}" method="POST">
         {{ form.hidden_tag() }}
         <div class="form-group">
-            {{ form.title.label(class="text-light") }}
+            {{ form.title.label() }}
             {{ form.title(class="form-control") }}
         </div>
         <div class="form-group">
-            {{ form.description.label(class="text-light") }}
+            {{ form.description.label() }}
             {{ form.description(class="form-control") }}
         </div>
         <div class="form-group">
-            {{ form.category.label(class="text-light") }}
+            {{ form.category.label() }}
             {{ form.category(class="form-control") }}
         </div>
-        <h5 class="text-light">Balsošanas opcijas</h5>
+        <h5 class="mt-4">Balsošanas opcijas</h5>
         <div id="voting-options">
             {% for voting_option in form.voting_options %}
                 <div class="form-group">
-                    {{ voting_option.option_text.label(class="text-light") }}
+                    {{ voting_option.option_text.label() }}
                     {{ voting_option.option_text(class="form-control") }}
                 </div>
             {% endfor %}
@@ -44,7 +44,7 @@
         const option = document.createElement('div');
         option.classList.add('form-group');
         option.innerHTML = `
-            <label class="text-light" for="voting_options-${index}-option_text">Option</label>
+            <label for="voting_options-${index}-option_text">Option</label>
             <input class="form-control" id="voting_options-${index}-option_text" name="voting_options-${index}-option_text" type="text">
             <input type="hidden" name="csrf_token" value="${csrfToken}">
         `;
@@ -53,6 +53,10 @@
     }
 </script>
 {% endblock %}
+
+
+
+
 
 
 

@@ -2,26 +2,26 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="text-light mb-4">Mans profils</h1>
-    <p class="text-light">Lietotājvārds: {{ current_user.username }}</p>
+    <h1 class="mb-4">Mans profils</h1>
+    <p>Lietotājvārds: {{ current_user.username }}</p>
     <a href="{{ url_for('edit_profile') }}" class="btn btn-secondary mb-4">Labot profilu</a>
     <a href="{{ url_for('change_password') }}" class="btn btn-secondary mb-4">Mainīt paroli</a>
     {% if current_user.role == 'creator' %}
         <a href="{{ url_for('create_idea') }}" class="btn btn-primary mb-4">Man ir ierosinājums!</a>
     {% endif %}
-    <h2 class="text-light">Mani ierosinājumi</h2>
+    <h2 class="mb-4">Mani ierosinājumi</h2>
     <!-- User's idea cards display -->
     {% if ideas %}
         {% for idea in ideas %}
-        <div class="card bg-secondary mb-3">
+        <div class="card bg-light mb-3">
             <div class="card-body">
-                <h5 class="card-title text-light">{{ idea.title }}</h5>
+                <h5 class="card-title">{{ idea.title }}</h5>
                 <h6 class="card-subtitle mb-2 text-muted">{{ idea.category }}</h6>
-                <p class="card-text text-light">{{ idea.description }}</p>
+                <p class="card-text">{{ idea.description }}</p>
                 <div class="mb-2">
                     <small class="text-muted">Posted on {{ idea.date_posted.strftime('%Y-%m-%d %H:%M') }}</small>
                 </div>
-                <p class="text-light">Patīk: {{ idea.like_count }}</p>
+                <p>Patīk: {{ idea.like_count }}</p>
                 <a href="{{ url_for('edit_idea', idea_id=idea.id) }}" class="btn btn-info">Edit</a>
                 <form method="POST" action="{{ url_for('delete_idea', idea_id=idea.id) }}" style="display:inline;">
                     <button type="submit" class="btn btn-danger" onclick="return confirm('Vai esat pārliecināts, ka vēlaties dzēst šo ideju?');">Delete</button>
@@ -30,10 +30,15 @@
         </div>
         {% endfor %}
     {% else %}
-    <p class="text-light">Jums vēl nav ierosinājumu</p>
+    <p>Jums vēl nav ierosinājumu</p>
     {% endif %}
 </div>
 {% endblock %}
+
+
+
+
+
 
 
 

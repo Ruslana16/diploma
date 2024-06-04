@@ -15,6 +15,10 @@ class Config:
     DEBUG = True
     WTF_CSRF_ENABLED = True
     WTF_CSRF_SECRET_KEY = os.getenv('WTF_CSRF_SECRET_KEY', 'another_hard_to_guess_string')
+    
+    RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY', '6LfQF_EpAAAAAJRD1RNayz0jOJrNzgGlMJN6G49Q')
+    RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY', '6LfQF_EpAAAAAFfx_BOWhuqQYeAI8M1uqgdC0RsI')
+
 
 
 

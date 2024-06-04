@@ -4,25 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Balsu Vilnis{% endblock %}</title>
-    <!-- Bootswatch Darkly Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/darkly/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootswatch Lux Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5/dist/lux/bootstrap.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #5D5FEF; /* Violet color from presentation */
+        }
         body {
             font-family: 'Poppins', sans-serif;
         }
-        h1 {
+        h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6 {
             font-family: 'Poppins', sans-serif;
-            color: #345d89; /* Match button color */
+            color: var(--primary-color) !important; /* Ensuring violet color is applied to all headings */
             font-weight: 800;
-            font-size: 4.3rem;
         }
-        h2 {
-            font-family: 'Poppins', sans-serif;
-            color: #6c757d; /* A bit lighter gray for contrast */
-            font-weight: 400;
-            font-size: 1.5rem; /* Smaller size */
+        h1, .h1 {
+            font-size: 5rem; /* Increased size for h1 */
+        }
+        h2, .h2 {
+            font-size: 3rem; /* Adjusted size for h2 */
+        }
+        h3, .h3 {
+            font-size: 2.5rem; /* Adjusted size for h3 */
+        }
+        h4, .h4 {
+            font-size: 2rem; /* Adjusted size for h4 */
+        }
+        h5, .h5 {
+            font-size: 1.5rem; /* Adjusted size for h5 */
+        }
+        h6, .h6 {
+            font-size: 1.25rem; /* Adjusted size for h6 */
         }
         .reply-list {
             margin-left: 20px; /* Indent replies */
@@ -30,13 +44,51 @@
             padding-left: 10px;
         }
         .reply-item {
-            background-color: #343a40; /* Darker background color for replies to match the dark theme */
+            background-color: #f8f9fa; /* Lighter background color for replies */
+        }
+        .card {
+            background-color: #f8f9fa; /* Light background for cards */
+            color: #000; /* Dark text for better contrast */
+        }
+        .navbar-dark .navbar-nav .nav-link {
+            color: #fff;
+        }
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: #ddd;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .btn-primary:hover {
+            background-color: #4b4fee;
+            border-color: #4b4fee;
+        }
+        .btn-primary:focus, .btn-primary:active {
+            background-color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+            color: #ffffff !important;
+        }
+        .bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+        .navbar-dark {
+            background-color: var(--primary-color) !important;
+        }
+        .navbar-brand {
+            color: #fff !important;
+        }
+        .text-primary {
+            color: var(--primary-color) !important;
         }
     </style>
-    {% block head %}{% endblock %}
+    {% block head %}
+    <!-- Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    {% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <a class="navbar-brand" href="{{ url_for('home') }}">Balsu Vilnis</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -76,6 +128,26 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

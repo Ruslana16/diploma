@@ -6,9 +6,9 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="text-light mb-4">Visi ierosinājumi</h1>
+    <h1 class="mb-4">Visi ierosinājumi</h1>
     {% for idea in ideas %}
-        <div class="card mb-4">
+        <div class="card bg-light mb-4">
             <div class="card-body">
                 <h5 class="card-title">{{ idea.title }}</h5>
                 <p class="card-text">{{ idea.description }}</p>
@@ -24,6 +24,9 @@
     {% endfor %}
 </div>
 {% endblock %}
+
+
+
 
 
 
