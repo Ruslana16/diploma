@@ -2,13 +2,18 @@
 
 {% block title %}Reģistrēties{% endblock %}
 
+{% block head %}
+<!-- Add reCAPTCHA script in the head block -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <h1 class="text-dark mb-4">Reģistrēties</h1>
-    <form method="POST" action="{{ url_for('registration') }}">
+    <h1 class="text-primary mb-4">Reģistrēties</h1>
+    <form method="POST" action="{{ url_for('registration', role=role) }}">
         {{ form.hidden_tag() }}
         <div class="form-group">
-            <label for="username" class="text-dark">Lietotājvārds</label>
+            <label for="username" class="text-primary">Lietotājvārds</label>
             {{ form.username(class_="form-control", id="username") }}
             {% if form.username.errors %}
                 <div class="text-danger">
@@ -18,8 +23,9 @@
                 </div>
             {% endif %}
         </div>
+        {% if role == 'creator' %}
         <div class="form-group">
-            <label for="email" class="text-dark">Email</label>
+            <label for="email" class="text-primary">E-pasts</label>
             {{ form.email(class_="form-control", id="email") }}
             {% if form.email.errors %}
                 <div class="text-danger">
@@ -29,8 +35,9 @@
                 </div>
             {% endif %}
         </div>
+        {% endif %}
         <div class="form-group">
-            <label for="password" class="text-dark">Password</label>
+            <label for="password" class="text-primary">Parole</label>
             {{ form.password(class_="form-control", id="password") }}
             {% if form.password.errors %}
                 <div class="text-danger">
@@ -41,7 +48,7 @@
             {% endif %}
         </div>
         <div class="form-group">
-            <label for="confirm_password" class="text-dark">Confirm Password</label>
+            <label for="confirm_password" class="text-primary">Apstiprināt paroli</label>
             {{ form.confirm_password(class_="form-control", id="confirm_password") }}
             {% if form.confirm_password.errors %}
                 <div class="text-danger">
@@ -51,24 +58,21 @@
                 </div>
             {% endif %}
         </div>
-        <div class="form-group">
-            <label class="text-dark">Role</label>
-            {{ form.role(class_="form-check-input", id="role") }}
-            {% if form.role.errors %}
-                <div class="text-danger">
-                    {% for error in form.role.errors %}
-                        <span>{{ error }}</span>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
-        <div class="g-recaptcha" data-sitekey="6LfQF_EpAAAAAJRD1RNayz0jOJrNzgGlMJN6G49Q"></div> <!-- Add this line -->
+        <div class="g-recaptcha" data-sitekey="6LfQF_EpAAAAAJRD1RNayz0jOJrNzgGlMJN6G49Q"></div>
         <div class="form-group mt-3">
-            <button type="submit" class="btn btn-primary">Sign Up</button>
+            <button type="submit" class="btn btn-primary">Reģistrēties</button>
         </div>
     </form>
 </div>
 {% endblock %}
+
+
+
+
+
+
+
+
 
 
 

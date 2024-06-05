@@ -7,24 +7,23 @@
 {% block content %}
 <style>
     .hero-section {
-        background-color: #f8f9fa;
+        background-color: #ffffff; /* Changed to white background */
         color: #000;
-        padding: 20px 0; /* Reduced padding */
+        padding: 40px 0; /* Increased padding */
         text-align: center;
     }
     .hero-section h1 {
         font-size: 4rem;
         font-weight: 800;
-        margin-bottom: 15px; /* Adjusted margin */
+        margin-bottom: 20px; /* Adjusted margin */
     }
     .hero-section h2 {
         font-size: 1.5rem; /* Reduced size */
-        margin-bottom: 10px; /* Adjusted margin */
+        margin-bottom: 15px; /* Adjusted margin */
     }
     .role-selection {
-        padding: 10px 0; /* Reduced padding */
-        border-radius: 10px;
-        margin-top: 10px; /* Reduced margin */
+        padding: 20px 0; /* Increased padding */
+        margin-top: 20px; /* Increased margin */
     }
     .role-card {
         border: none;
@@ -34,6 +33,7 @@
         flex-direction: column;
         justify-content: space-between;
         height: 100%; /* Ensure equal height */
+        margin-bottom: 20px; /* Added margin bottom */
     }
     .role-card-body {
         flex-grow: 1;
@@ -69,22 +69,27 @@
     }
     .navbar-brand {
         color: #fff !important;
+        padding-left: 20px; /* Add padding to move it to the right */
     }
     .text-primary {
         color: var(--primary-color) !important;
+    }
+    .divider {
+        border-left: 2px solid var(--primary-color);
+        height: 100%;
+        margin: 0 15px; /* Adjust margin as needed */
     }
 </style>
 
 <div class="hero-section">
     <h1 class="text-primary">Balsu Vilnis</h1>
     <h2 class="text-secondary">Jūsu balsij ir nozīme!</h2>
-    <p class="lead">Šeit Jūs varat būt vai radītājs, vai novērotājs. Izvēlieties savu lomu un pievienojieties mums!</p>
 </div>
 
 <div class="container role-selection text-center">
-    <h2 class="mb-4 text-primary" style="font-size: 1.5rem;">Izvēlieties savu lomu un pievienojieties mums!</h2> <!-- Smaller font size -->
     <div class="row justify-content-center">
         <div class="col-md-5">
+            <h2 class="mb-4 text-primary" style="font-size: 1.5rem;">ar savām idejām padariet pasauli labāku</h2>
             <div class="card role-card shadow-sm">
                 <div class="card-body role-card-body">
                     <div>
@@ -95,7 +100,11 @@
                 </div>
             </div>
         </div>
+        <div class="col-auto d-flex align-items-center">
+            <div class="divider"></div> <!-- Added vertical divider -->
+        </div>
         <div class="col-md-5">
+            <h2 class="mb-4 text-primary" style="font-size: 1.5rem;">uzzināt patieso sabiedrības viedokli par dažādām tēmām</h2>
             <div class="card role-card shadow-sm">
                 <div class="card-body role-card-body">
                     <div>
@@ -109,6 +118,9 @@
     </div>
 </div>
 {% endblock %}
+
+
+
 
 
 

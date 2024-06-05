@@ -79,14 +79,14 @@ def register_routes(app):
         role = request.args.get('role')
         form = RegistrationForm(role=role)  # Pass role to form
 
-    # Adjust email validators based on role
+        # Adjust email validators based on role
         if role == 'creator':
             form.email.validators = [DataRequired(), Email()]
         else:
             form.email.validators = [Optional()]
 
         if form.validate_on_submit():
-        # Verify reCAPTCHA
+            # Verify reCAPTCHA
             if not form.recaptcha.errors:
                 email = form.email.data if role == 'creator' else None
                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
@@ -94,8 +94,9 @@ def register_routes(app):
                 db.session.add(user)
                 db.session.commit()
 
-            # Automatically log the user in after registration
+                # Automatically log the user in after registration
                 login_user(user)
+                print("User logged in:", user.username)  # Debug statement
 
                 if user.email:
                     token = generate_confirmation_token(user.email)
@@ -104,11 +105,18 @@ def register_routes(app):
                     send_email(user.email, 'Please confirm your email', html)
 
                 flash('Thank you for registering! Please check your email for a confirmation link.', 'success')
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('dashboard'))  # Redirect to the dashboard after registration
             else:
                 flash('Please complete the reCAPTCHA.', 'danger')
+        else:
+            print("Form validation failed:", form.errors)  # Debug statement
+            print("Form data:", form.data)  # Additional debug statement
 
         return render_template('registration.html', title='Register', form=form, role=role)
+
+
+
+
 
 
     @app.route('/confirm/<token>')

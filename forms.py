@@ -82,6 +82,10 @@ class IdeaForm(FlaskForm):
     voting_options = FieldList(FormField(VotingOptionForm), min_entries=1, max_entries=5)
     submit = SubmitField('Submit Idea')
 
+
+class DeleteIdeaForm(FlaskForm):
+    submit = SubmitField('Delete')
+
 class LikeForm(FlaskForm):
     idea_id = HiddenField(validators=[DataRequired()])
     submit = SubmitField('Like')

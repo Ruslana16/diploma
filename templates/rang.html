@@ -12,11 +12,11 @@
             <div class="card-body">
                 <h5 class="card-title">{{ idea.title }}</h5>
                 <p class="card-text">{{ idea.description }}</p>
-                <p class="card-text"><small class="text-muted">Posted on {{ idea.date_posted.strftime('%Y-%m-%d %H:%M:%S') }} by {{ idea.user.username }}</small></p>
+                <p class="card-text"><small class="text-muted">Publicēts {{ idea.date_posted.strftime('%Y-%m-%d %H:%M:%S') }} by {{ idea.user.username }}</small></p>
                 <form action="{{ url_for('like_idea', idea_id=idea.id) }}" method="POST">
                     {{ form.hidden_tag() }}
                     <button type="submit" class="btn btn-primary">Patīk</button>
-                    <span>Likes: {{ idea.likes|length }}</span>
+                    <span>"Patīk" skaits: {{ idea.likes|length }}</span>
                 </form>
                 <a href="{{ url_for('view_idea', idea_id=idea.id) }}" class="btn btn-secondary">Apskatīt un komentēt</a>
             </div>

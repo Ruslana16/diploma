@@ -61,8 +61,8 @@
             border-color: var(--primary-color);
         }
         .btn-primary:hover {
-            background-color: #4b4fee;
-            border-color: #4b4fee;
+            background-color: darken(var(--primary-color), 10%);
+            border-color: darken(var(--primary-color), 10%);
         }
         .btn-primary:focus, .btn-primary:active {
             background-color: var(--primary-color) !important;
@@ -77,15 +77,13 @@
         }
         .navbar-brand {
             color: #fff !important;
+            padding-left: 20px; /* Add padding to move it to the right */
         }
         .text-primary {
             color: var(--primary-color) !important;
         }
     </style>
-    {% block head %}
-    <!-- Google reCAPTCHA -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    {% endblock %}
+    {% block head %}{% endblock %}
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
@@ -128,6 +126,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+
+
 
 
 
