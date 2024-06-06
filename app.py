@@ -1,3 +1,8 @@
+import os
+import ssl
+import urllib.request
+import json
+import certifi
 from flask import Flask, render_template, redirect, url_for, flash, request, jsonify, abort
 from extensions import db, mail, login_manager, bcrypt, migrate
 from forms import RegistrationForm, CommentForm, LikeForm, VotingOptionForm, LoginForm, ContactForm, IdeaForm, UpdateProfileForm, ChangePasswordForm
@@ -7,14 +12,18 @@ from emails import send_email
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
 from dotenv import load_dotenv
-import os
-import ssl
-import urllib.request
-import json
-import certifi
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from wtforms.validators import DataRequired, Email, Optional
+
+# Ensure all urllib requests use the verified HTTPS handler
+class VerifiedHTTPSHandler(urllib.request.HTTPSHandler):
+    def __init__(self):
+        context = ssl.create_default_context(cafile=certifi.where())
+        super().__init__(context=context)
+
+opener = urllib.request.build_opener(VerifiedHTTPSHandler())
+urllib.request.install_opener(opener)
 
 # Load environment variables
 load_dotenv()
@@ -53,14 +62,11 @@ def create_app():
 def verify_recaptcha(response_token):
     recaptcha_secret = os.getenv('RECAPTCHA_PRIVATE_KEY')
     url = f"https://www.google.com/recaptcha/api/siteverify?secret={recaptcha_secret}&response={response_token}"
-    
-    # Create an SSL context using certifi
-    context = ssl.create_default_context(cafile=certifi.where())
-    
+
     try:
-        # Open the URL with the specified context
-        response = urllib.request.urlopen(url, context=context)
+        response = urllib.request.urlopen(url)
         result = json.load(response)
+        print("reCAPTCHA verification result:", result)  # Debug statement
         return result.get('success', False)
     except urllib.error.URLError as e:
         print(f"Error verifying reCAPTCHA: {e}")
@@ -96,14 +102,8 @@ def register_routes(app):
 
     @app.route('/registration', methods=['GET', 'POST'])
     def registration():
-        role = request.args.get('role')
+        role = request.args.get('role', 'observer')
         form = RegistrationForm(role=role)  # Pass role to form
-
-        # Adjust email validators based on role
-        if role == 'creator':
-            form.email.validators = [DataRequired(), Email()]
-        else:
-            form.email.validators = [Optional()]
 
         if form.validate_on_submit():
             # Verify reCAPTCHA
@@ -334,7 +334,7 @@ def register_routes(app):
         # Handling like form submission
         if current_user.role == 'creator' and like_form.validate_on_submit() and 'like_button' in request.form:
             existing_like = Like.query.filter_by(user_id=current_user.id, idea_id=idea_id).first()
-            if existing_like:
+            if (existing_like):
                 flash('You have already liked this idea.', 'warning')
             else:
                 new_like = Like(user_id=current_user.id, idea_id=idea_id)
@@ -432,6 +432,7 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
 

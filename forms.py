@@ -8,7 +8,7 @@ from flask_wtf import RecaptchaField
 class RegistrationForm(FlaskForm):
     username = StringField('Username', [
         DataRequired(),
-        Length(min=4, max=25)
+        Length(min=4, max=15)
     ])
     password = PasswordField('Password', [
         DataRequired(),
