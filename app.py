@@ -8,6 +8,10 @@ from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime
 from dotenv import load_dotenv
 import os
+import ssl
+import urllib.request
+import json
+import certifi
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from wtforms.validators import DataRequired, Email, Optional
@@ -45,6 +49,22 @@ def create_app():
     register_routes(app)
 
     return app
+
+def verify_recaptcha(response_token):
+    recaptcha_secret = os.getenv('RECAPTCHA_PRIVATE_KEY')
+    url = f"https://www.google.com/recaptcha/api/siteverify?secret={recaptcha_secret}&response={response_token}"
+    
+    # Create an SSL context using certifi
+    context = ssl.create_default_context(cafile=certifi.where())
+    
+    try:
+        # Open the URL with the specified context
+        response = urllib.request.urlopen(url, context=context)
+        result = json.load(response)
+        return result.get('success', False)
+    except urllib.error.URLError as e:
+        print(f"Error verifying reCAPTCHA: {e}")
+        return False
 
 def register_routes(app):
     @app.route('/')
@@ -87,7 +107,8 @@ def register_routes(app):
 
         if form.validate_on_submit():
             # Verify reCAPTCHA
-            if not form.recaptcha.errors:
+            recaptcha_response = request.form.get('g-recaptcha-response')
+            if verify_recaptcha(recaptcha_response):
                 email = form.email.data if role == 'creator' else None
                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
                 user = User(username=form.username.data, email=email, password=hashed_password, role=role, confirmed=False)
@@ -113,11 +134,6 @@ def register_routes(app):
             print("Form data:", form.data)  # Additional debug statement
 
         return render_template('registration.html', title='Register', form=form, role=role)
-
-
-
-
-
 
     @app.route('/confirm/<token>')
     def confirm_email(token):
@@ -416,6 +432,11 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+
+
 
 
 
