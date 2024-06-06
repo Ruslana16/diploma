@@ -16,7 +16,6 @@ from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from wtforms.validators import DataRequired, Email, Optional
 
-# Ensure all urllib requests use the verified HTTPS handler
 class VerifiedHTTPSHandler(urllib.request.HTTPSHandler):
     def __init__(self):
         context = ssl.create_default_context(cafile=certifi.where())
@@ -25,28 +24,26 @@ class VerifiedHTTPSHandler(urllib.request.HTTPSHandler):
 opener = urllib.request.build_opener(VerifiedHTTPSHandler())
 urllib.request.install_opener(opener)
 
-# Load environment variables
+
 load_dotenv()
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object('config.Config')
 
-    # Ensure SECRET_KEY is set
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'a_hard_to_guess_string')
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'hbcirebvyrebgvugbenvu')
 
-    # Initialize CSRF protection
     csrf = CSRFProtect(app)
 
-    # Initialize extensions
+
     db.init_app(app)
     mail.init_app(app)
     login_manager.init_app(app)
     bcrypt.init_app(app)
     migrate.init_app(app, db)
-    csrf.init_app(app)  # Ensure CSRF protection is initialized
+    csrf.init_app(app)  
 
-    # User Loader
+    
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
@@ -54,7 +51,7 @@ def create_app():
     def inject_user():
         return dict(current_user=current_user)
 
-    # Register blueprints or routes
+    
     register_routes(app)
 
     return app
@@ -66,7 +63,7 @@ def verify_recaptcha(response_token):
     try:
         response = urllib.request.urlopen(url)
         result = json.load(response)
-        print("reCAPTCHA verification result:", result)  # Debug statement
+        print("reCAPTCHA verification result:", result)  
         return result.get('success', False)
     except urllib.error.URLError as e:
         print(f"Error verifying reCAPTCHA: {e}")
@@ -103,10 +100,10 @@ def register_routes(app):
     @app.route('/registration', methods=['GET', 'POST'])
     def registration():
         role = request.args.get('role', 'observer')
-        form = RegistrationForm(role=role)  # Pass role to form
+        form = RegistrationForm(role=role)  
 
         if form.validate_on_submit():
-            # Verify reCAPTCHA
+           
             recaptcha_response = request.form.get('g-recaptcha-response')
             if verify_recaptcha(recaptcha_response):
                 email = form.email.data if role == 'creator' else None
@@ -115,9 +112,9 @@ def register_routes(app):
                 db.session.add(user)
                 db.session.commit()
 
-                # Automatically log the user in after registration
+               
                 login_user(user)
-                print("User logged in:", user.username)  # Debug statement
+                print("User logged in:", user.username)  
 
                 if user.email:
                     token = generate_confirmation_token(user.email)
@@ -126,12 +123,12 @@ def register_routes(app):
                     send_email(user.email, 'Please confirm your email', html)
 
                 flash('Thank you for registering! Please check your email for a confirmation link.', 'success')
-                return redirect(url_for('dashboard'))  # Redirect to the dashboard after registration
+                return redirect(url_for('dashboard'))  
             else:
                 flash('Please complete the reCAPTCHA.', 'danger')
         else:
-            print("Form validation failed:", form.errors)  # Debug statement
-            print("Form data:", form.data)  # Additional debug statement
+            print("Form validation failed:", form.errors)  
+            print("Form data:", form.data)  
 
         return render_template('registration.html', title='Register', form=form, role=role)
 
@@ -194,7 +191,7 @@ def register_routes(app):
     @app.route('/rang')
     def rang():
         all_ideas = Idea.query.all()
-        like_form = LikeForm()  # Create an instance of LikeForm
+        like_form = LikeForm()  
         return render_template('rang.html', ideas=all_ideas, form=like_form)
 
 
@@ -209,7 +206,7 @@ def register_routes(app):
     def edit_idea(idea_id):
         idea = Idea.query.get_or_404(idea_id)
         if idea.user_id != current_user.id:
-            abort(403)  # Forbidden if not the creator
+            abort(403) 
         form = IdeaForm(obj=idea)
         if form.validate_on_submit():
             idea.title = form.title.data
@@ -225,7 +222,7 @@ def register_routes(app):
     def delete_idea(idea_id):
         idea = Idea.query.get_or_404(idea_id)
         if idea.user_id != current_user.id:
-            abort(403)  # Forbidden if not the creator
+            abort(403)  
         try:
             db.session.delete(idea)
             db.session.commit()
@@ -297,11 +294,11 @@ def register_routes(app):
         comment_form = CommentForm()
         like_form = LikeForm()
 
-        # Check if the user has already voted
+        
         user_vote = Vote.query.filter_by(user_id=current_user.id, idea_id=idea_id).first()
         has_voted = user_vote is not None
 
-        # Handling vote form submission
+        
         if request.method == 'POST' and 'voting_option' in request.form:
             if current_user.role != 'creator':
                 flash('Voting is only available for creators.', 'danger')
@@ -314,7 +311,7 @@ def register_routes(app):
                     selected_option.votes += 1
                     db.session.commit()
 
-                    # Record the vote
+                    
                     vote = Vote(user_id=current_user.id, idea_id=idea_id, option_id=selected_option_id)
                     db.session.add(vote)
                     db.session.commit()
@@ -322,7 +319,7 @@ def register_routes(app):
                     flash('Your vote has been recorded!', 'success')
                 return redirect(url_for('view_idea', idea_id=idea_id))
 
-        # Handling comment form submission
+        
         if current_user.role == 'creator' and comment_form.validate_on_submit() and 'content' in request.form:
             parent_id = comment_form.parent_id.data or None
             comment = Comment(content=comment_form.content.data, user_id=current_user.id, idea_id=idea_id, parent_id=parent_id)
@@ -331,7 +328,7 @@ def register_routes(app):
             flash('Your comment has been posted!', 'success')
             return redirect(url_for('view_idea', idea_id=idea_id))
 
-        # Handling like form submission
+        
         if current_user.role == 'creator' and like_form.validate_on_submit() and 'like_button' in request.form:
             existing_like = Like.query.filter_by(user_id=current_user.id, idea_id=idea_id).first()
             if (existing_like):
@@ -343,7 +340,7 @@ def register_routes(app):
                 flash('You have liked the idea.', 'success')
             return redirect(url_for('view_idea', idea_id=idea_id))
 
-        # Prepare data for Chart.js
+        
         voting_labels = [option.option_text for option in voting_options]
         voting_votes = [option.votes for option in voting_options]
 
