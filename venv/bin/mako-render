@@ -1,4 +1,4 @@
-#!/Users/ruslanajankovska/Documents/diploma/venv/bin/python3.12
+#!/Users/ruslanajankovska/Documents/BalsuVilnis/venv/bin/python3.12
 # -*- coding: utf-8 -*-
 import re
 import sys

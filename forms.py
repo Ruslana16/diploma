@@ -4,29 +4,39 @@ from wtforms.validators import DataRequired, Length, EqualTo, Email, Optional, V
 from models import User
 from wtforms import StringField, TextAreaField, FieldList, FormField, SubmitField
 from flask_wtf import RecaptchaField
+import re
+from flask import flash
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', [
-        DataRequired(),
-        Length(min=4, max=15)
+    username = StringField('Lietotājvārds', [
+        DataRequired(message='Lietotājvārds ir obligāts'),
+        Length(min=4, max=15, message='Lietotājvārdam jābūt no 4 līdz 15 simboliem garam')
     ])
-    password = PasswordField('Password', [
-        DataRequired(),
-        EqualTo('confirm_password', message='Passwords must match')
+    password = PasswordField('Parole', [
+        DataRequired(message='Parole ir obligāta'),
+        Length(min=8, message='Parolei jābūt vismaz 8 simboliem garai'),
+        EqualTo('confirm_password', message='Parolēm jāsakrīt'),
     ])
+    confirm_password = PasswordField('Apstiprināt paroli')
     recaptcha = RecaptchaField()
-    role = HiddenField('Role') 
-    confirm_password = PasswordField('Confirm Password')
-    
-    # Email field is optional and added only if the role is creator
-    email = StringField('Email', [
+    role = HiddenField('Loma')
+
+    email = StringField('E-pasts', [
         Optional(),
-        Email()
+        Email(message='Lūdzu, ievadiet derīgu e-pasta adresi')
     ])
 
-    submit = SubmitField('Sign Up')
-
-    submit = SubmitField('Sign Up')
+    def validate_password(form, field):
+        password = field.data
+        if not re.search(r'[A-Z]', password):
+            flash('Parolei jābūt vismaz vienam lielajam burtam.', 'danger')
+            raise ValidationError('Parolei jābūt vismaz vienam lielajam burtam.')
+        if not re.search(r'\d', password):
+            flash('Parolei jābūt vismaz vienam ciparam.', 'danger')
+            raise ValidationError('Parolei jābūt vismaz vienam ciparam.')
+        if not re.search(r'[\W]', password):  # Non-word character (symbol)
+            flash('Parolei jābūt vismaz vienam simbolam.', 'danger')
+            raise ValidationError('Parolei jābūt vismaz vienam simbolam.')
 
             
 class VotingOptionForm(FlaskForm):

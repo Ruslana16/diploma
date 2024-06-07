@@ -137,6 +137,20 @@ def register_routes(app):
             print(f"reCAPTCHA response: {recaptcha_response}")  # Debug statement
             if verify_recaptcha(recaptcha_response):
                 email = form.email.data if role == 'creator' else None
+
+                # Check for existing username
+                existing_user = User.query.filter_by(username=form.username.data).first()
+                if existing_user:
+                    flash('Lietotājvārds jau eksistē. Lūdzu, izvēlieties citu.', 'danger')
+                    return render_template('registration.html', title='Reģistrēties', form=form, role=role, recaptcha_public_key=recaptcha_public_key)
+
+                # Check for existing email (if email is required)
+                if email:
+                    existing_email = User.query.filter_by(email=email).first()
+                    if existing_email:
+                        flash('E-pasta adrese jau eksistē. Lūdzu, izvēlieties citu.', 'danger')
+                        return render_template('registration.html', title='Reģistrēties', form=form, role=role, recaptcha_public_key=recaptcha_public_key)
+
                 hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
                 user = User(username=form.username.data, email=email, password=hashed_password, role=role, confirmed=False)
                 db.session.add(user)
@@ -160,6 +174,9 @@ def register_routes(app):
             print("Formas dati:", form.data)  # Additional debug statement
 
         return render_template('registration.html', title='Reģistrēties', form=form, role=role, recaptcha_public_key=recaptcha_public_key)
+
+
+
 
     @app.route('/dashboard')
     @login_required
