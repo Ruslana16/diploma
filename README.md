@@ -23,7 +23,7 @@ Instalācija
 
 bash
 Copy code
-git clone <jūsu_repozitorijas_URL>
+git clone <https://github.com/Ruslana16/diploma/tree/main>
 cd <jūsu_repozitorijas_direktorija>
 
 
