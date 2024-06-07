@@ -11,6 +11,7 @@
     <style>
         :root {
             --primary-color: #5D5FEF; /* Violet color from presentation */
+            --primary-color-dark: #4a4dcc; /* Darker shade for hover */
         }
         body {
             font-family: 'Poppins', sans-serif;
@@ -61,8 +62,8 @@
             border-color: var(--primary-color);
         }
         .btn-primary:hover {
-            background-color: darken(var(--primary-color), 10%);
-            border-color: darken(var(--primary-color), 10%);
+            background-color: var(--primary-color-dark);
+            border-color: var(--primary-color-dark);
         }
         .btn-primary:focus, .btn-primary:active {
             background-color: var(--primary-color) !important;
@@ -126,6 +127,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+
 
 
 

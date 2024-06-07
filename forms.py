@@ -26,6 +26,8 @@ class RegistrationForm(FlaskForm):
 
     submit = SubmitField('Sign Up')
 
+    submit = SubmitField('Sign Up')
+
             
 class VotingOptionForm(FlaskForm):
     option_text = StringField('Option', validators=[DataRequired()])

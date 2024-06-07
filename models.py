@@ -27,6 +27,7 @@ class Idea(db.Model):
     likes = db.relationship('Like', backref='idea', lazy=True)
     comments = db.relationship('Comment', backref='parent_idea', lazy=True)
     idea_votes = db.relationship('Vote', backref='parent_idea_votes', lazy=True)  # Renamed backref to 'parent_idea_votes'
+    voting_options = db.relationship('VotingOption', backref='idea', lazy=True)
 
     def __repr__(self):
         return f"<Idea {self.title}>"

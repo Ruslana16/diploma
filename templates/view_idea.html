@@ -21,17 +21,17 @@
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="voting_option" id="option{{ option.id }}" value="{{ option.id }}">
                         <label class="form-check-label text-dark" for="option{{ option.id }}">
-                            {{ option.option_text }} ({{ option.votes }} votes)
+                            {{ option.option_text }} ({{ option.votes }} balsis)
                         </label>
                     </div>
                 {% endfor %}
-                <button type="submit" class="btn btn-primary mt-3">Vote</button>
+                <button type="submit" class="btn btn-primary mt-3">Balsot</button>
             </form>
         {% else %}
             <p class="text-dark">Jūs jau esat balsojis par šo ideju.</p>
         {% endif %}
     {% else %}
-        <p class="text-dark">Balsošana ir pieejama tikai raditājiem</p>
+        <p class="text-dark">Balsošana ir pieejama tikai radītājiem</p>
     {% endif %}
 
     <hr class="bg-dark">
@@ -41,23 +41,23 @@
     {% if current_user.role == 'creator' %}
         <form action="{{ url_for('like_idea', idea_id=idea.id) }}" method="POST" class="mt-3">
             {{ like_form.hidden_tag() }}
-            <button type="submit" name="like_button" class="btn btn-success">Like</button>
+            <button type="submit" name="like_button" class="btn btn-success">Patīk</button>
         </form>
     {% else %}
         <p class="text-dark">Opcija tikai radītājiem.</p>
     {% endif %}
 
     <hr class="bg-dark">
-    <h2 class="text-primary">Comments</h2>
+    <h2 class="text-primary">Komentāri</h2>
     {% if current_user.role == 'creator' %}
         <form action="{{ url_for('view_idea', idea_id=idea.id) }}" method="POST" class="mb-4">
             {{ comment_form.hidden_tag() }}
             <div class="form-group">
-                {{ comment_form.content.label(class="form-control-label text-dark") }}
+                {{ comment_form.content.label(class="form-control-label text-dark", text="Komentārs") }}
                 {{ comment_form.content(class="form-control") }}
                 {{ comment_form.parent_id(class="form-control", type="hidden", value=0) }}
             </div>
-            <button type="submit" class="btn btn-primary">Add Comment</button>
+            <button type="submit" class="btn btn-primary">Pievienot komentāru</button>
         </form>
     {% else %}
         <p class="text-dark">Opcija tikai radītājiem.</p>
@@ -67,35 +67,35 @@
         {% for comment in comments %}
             {% if not comment.parent_id %}
                 <li class="list-group-item bg-light text-dark">
-                    <p>{{ comment.content }} <br> <em>by {{ comment.user.username }} on {{ comment.date_posted.strftime('%Y-%m-%d %H:%M:%S') }}</em></p>
+                    <p>{{ comment.content }} <br> <em>autors {{ comment.user.username }} {{ comment.date_posted.strftime('%Y-%m-%d %H:%M:%S') }}</em></p>
                     {% if comment.user_id == current_user.id %}
                         <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST" class="d-inline">
                             {{ comment_form.hidden_tag() }}
-                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            <button type="submit" class="btn btn-danger btn-sm">Dzēst</button>
                         </form>
                     {% endif %}
-                    <a href="#reply-{{ comment.id }}" data-toggle="collapse" aria-expanded="false" aria-controls="reply-{{ comment.id }}" class="text-dark">Reply</a>
+                    <a href="#reply-{{ comment.id }}" data-toggle="collapse" aria-expanded="false" aria-controls="reply-{{ comment.id }}" class="text-dark">Atbildēt</a>
                     
                     <div class="collapse" id="reply-{{ comment.id }}">
                         <form action="{{ url_for('reply_comment', comment_id=comment.id) }}" method="POST" class="mt-2">
                             {{ comment_form.hidden_tag() }}
                             <div class="form-group">
-                                {{ comment_form.content.label(class="form-control-label text-dark") }}
+                                {{ comment_form.content.label(class="form-control-label text-dark", text="Atbilde") }}
                                 {{ comment_form.content(class="form-control") }}
                                 {{ comment_form.parent_id(class="form-control", type="hidden", value=comment.id) }}
                             </div>
-                            <button type="submit" class="btn btn-primary">Reply</button>
+                            <button type="submit" class="btn btn-primary">Atbildēt</button>
                         </form>
                     </div>
 
                     {% for reply in comment.replies %}
                         <ul class="list-group mt-2 reply-list">
                             <li class="list-group-item reply-item text-dark">
-                                <p>{{ reply.content }} <br> <em>by {{ reply.user.username }} on {{ reply.date_posted.strftime('%Y-%m-%d %H:%M:%S') }}</em></p>
+                                <p>{{ reply.content }} <br> <em>autors {{ reply.user.username }} {{ reply.date_posted.strftime('%Y-%m-%d %H:%M:%S') }}</em></p>
                                 {% if reply.user_id == current_user.id %}
                                     <form action="{{ url_for('delete_comment', comment_id=reply.id) }}" method="POST" class="d-inline">
                                         {{ comment_form.hidden_tag() }}
-                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        <button type="submit" class="btn btn-danger btn-sm">Dzēst</button>
                                     </form>
                                 {% endif %}
                             </li>
@@ -106,7 +106,7 @@
         {% endfor %}
     </ul>
 
-    <a href="{{ url_for('rang') }}" class="btn btn-secondary mt-4">Back to all ideas</a>
+    <a href="{{ url_for('rang') }}" class="btn btn-secondary mt-4">Atpakaļ uz visām idejām</a>
 </div>
 
 <!-- Include Chart.js -->
@@ -118,7 +118,7 @@
         data: {
             labels: {{ voting_labels|tojson }},
             datasets: [{
-                label: 'Votes',
+                label: 'Balsis',
                 data: {{ voting_votes|tojson }},
                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 borderColor: 'rgba(75, 192, 192, 1)',
@@ -135,6 +135,7 @@
     });
 </script>
 {% endblock %}
+
 
 
 

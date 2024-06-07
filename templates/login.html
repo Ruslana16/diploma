@@ -8,8 +8,8 @@
     <form method="POST" action="{{ url_for('login') }}">
         {{ form.hidden_tag() }}
         <div class="form-group">
-            <label for="username" class="text-primary">Lietotājvārds</label>
-            {{ form.username(class_="form-control", id="username") }}
+            {{ form.username.label(class="text-primary") }}
+            {{ form.username(class="form-control") }}
             {% if form.username.errors %}
                 <div class="text-danger">
                     {% for error in form.username.errors %}
@@ -19,8 +19,8 @@
             {% endif %}
         </div>
         <div class="form-group">
-            <label for="password" class="text-primary">Parole</label>
-            {{ form.password(class_="form-control", id="password") }}
+            {{ form.password.label(class="text-primary") }}
+            {{ form.password(class="form-control") }}
             {% if form.password.errors %}
                 <div class="text-danger">
                     {% for error in form.password.errors %}
@@ -29,16 +29,17 @@
                 </div>
             {% endif %}
         </div>
-        <div class="form-check mt-3">
-            {{ form.remember(class_="form-check-input", id="remember") }}
-            <label for="remember" class="form-check-label text-primary">Atcerēties mani</label>
+        <div class="form-group form-check">
+            {{ form.remember(class="form-check-input") }}
+            {{ form.remember.label(class="form-check-label") }}
         </div>
-        <div class="form-group mt-3">
-            <button type="submit" class="btn btn-primary">Pieteikties</button>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary") }}
         </div>
     </form>
 </div>
 {% endblock %}
+
 
 
 
