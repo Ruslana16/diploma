@@ -23,6 +23,8 @@ Werkzeug>=2.2.2
 WTForms>=3.1.2
 gunicorn>=20.1.0
 certifi
+flask_limiter==2.0.4
+
 
 
 
