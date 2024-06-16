@@ -18,12 +18,22 @@
                     <button type="submit" class="btn btn-primary">Patīk</button>
                     <span>"Patīk" skaits: {{ idea.likes|length }}</span>
                 </form>
+                {% if idea.user_id == current_user.id %}
+                    <form method="POST" action="{{ url_for('delete_idea', idea_id=idea.id) }}" style="display:inline;">
+                        {{ delete_form.hidden_tag() }}
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Vai esat pārliecināts, ka vēlaties dzēst šo ideju?');">Delete</button>
+                    </form>
+                {% endif %}
                 <a href="{{ url_for('view_idea', idea_id=idea.id) }}" class="btn btn-secondary">Apskatīt un komentēt</a>
             </div>
         </div>
     {% endfor %}
 </div>
 {% endblock %}
+
+
+
+
 
 
 

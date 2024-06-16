@@ -8,6 +8,8 @@
     <p>Mēs labprāt uzklausīsim jūs! Lūdzu, aizpildiet zemāk esošo veidlapu, lai sazinātos ar mums.</p>
     
     <form action="{{ url_for('contact') }}" method="POST">
+        {{ csrf_token() }}
+        {{ form.hidden_tag() }}
         <div class="form-group">
             <label for="name">Vārds</label>
             <input type="text" class="form-control" id="name" name="name" required>
@@ -24,5 +26,6 @@
     </form>
 </div>
 {% endblock %}
+
 
 

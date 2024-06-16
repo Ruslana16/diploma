@@ -26,11 +26,12 @@ class Idea(db.Model):
     user = db.relationship('User', backref=db.backref('ideas', lazy=True))
     likes = db.relationship('Like', backref='idea', lazy=True)
     comments = db.relationship('Comment', backref='parent_idea', lazy=True)
-    idea_votes = db.relationship('Vote', backref='parent_idea_votes', lazy=True)  # Renamed backref to 'parent_idea_votes'
-    voting_options = db.relationship('VotingOption', backref='idea', lazy=True)
+    idea_votes = db.relationship('Vote', backref='parent_idea_votes', lazy=True)
+    voting_options = db.relationship('VotingOption', backref='idea', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Idea {self.title}>"
+
 
     @property
     def like_count(self):
@@ -62,7 +63,7 @@ class VotingOption(db.Model):
     option_text = db.Column(db.String(100), nullable=False)
     votes = db.Column(db.Integer, default=0)
     idea_id = db.Column(db.Integer, db.ForeignKey('idea.id'), nullable=False)
-    option_votes = db.relationship('Vote', backref='voting_option', lazy=True)  # Renamed backref to 'voting_option'
+    option_votes = db.relationship('Vote', backref='voting_option', lazy=True)
 
 class Vote(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -71,9 +72,20 @@ class Vote(db.Model):
     option_id = db.Column(db.Integer, db.ForeignKey('voting_option.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship('User', backref='user_votes')  # Renamed backref to 'user_votes'
-    idea = db.relationship('Idea', backref='parent_idea_votes')  # Renamed backref to 'parent_idea_votes'
-    option = db.relationship('VotingOption', backref='voting_option')  # Renamed backref to 'voting_option'
+    user = db.relationship('User', backref='user_votes')
+    idea = db.relationship('Idea', backref='parent_idea_votes')
+    option = db.relationship('VotingOption', backref='voting_option')
+
+class AuditLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    action = db.Column(db.String(255))
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='audit_logs')
+
+
+
 
 
 

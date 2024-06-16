@@ -42,6 +42,7 @@
         <div id="voting-options">
             {% for voting_option in form.voting_options %}
                 <div class="form-group">
+                    {{ voting_option.id }}
                     <label for="voting_options-{{ loop.index0 }}-option_text">Opcija</label>
                     {{ voting_option.option_text(class="form-control", id="voting_options-{{ loop.index0 }}-option_text") }}
                     {% if voting_option.option_text.errors %}
@@ -60,25 +61,9 @@
         </div>
     </form>
 </div>
-
-<script>
-    const csrfToken = '{{ form.csrf_token() }}';  // Store CSRF token in a JavaScript variable
-    let index = {{ form.voting_options|length }};  // Start from the current length of the voting options
-
-    function addVotingOption() {
-        const container = document.getElementById('voting-options');
-        const option = document.createElement('div');
-        option.classList.add('form-group');
-        option.innerHTML = `
-            <label for="voting_options-${index}-option_text">Opcija</label>
-            <input class="form-control" id="voting_options-${index}-option_text" name="voting_options-${index}-option_text" type="text">
-            <input type="hidden" name="csrf_token" value="${csrfToken}">
-        `;
-        container.appendChild(option);
-        index++;
-    }
-</script>
 {% endblock %}
+
+
 
 
 

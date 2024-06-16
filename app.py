@@ -3,10 +3,10 @@ import ssl
 import urllib.request
 import json
 import certifi
-from flask import Flask, render_template, redirect, url_for, flash, request, jsonify, abort
+from flask import Flask, render_template, redirect, url_for, flash, request, jsonify, abort, send_file
 from extensions import db, mail, login_manager, bcrypt, migrate
-from forms import RegistrationForm, CommentForm, LikeForm, VotingOptionForm, LoginForm, ContactForm, IdeaForm, UpdateProfileForm, ChangePasswordForm
-from models import User, Idea, Comment, Like, VotingOption, Vote
+from forms import RegistrationForm, CommentForm, LikeForm, VotingOptionForm, LoginForm, ContactForm, IdeaForm, UpdateProfileForm, ChangePasswordForm, RequestResetForm, ResetPasswordForm, AuditLogForm, DeleteIdeaForm
+from models import User, Idea, Comment, Like, VotingOption, Vote, AuditLog
 from utils import generate_confirmation_token, confirm_token
 from emails import send_email
 from flask_login import login_user, logout_user, login_required, current_user
@@ -14,14 +14,17 @@ from datetime import datetime
 from dotenv import load_dotenv
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
-from wtforms.validators import DataRequired, Email, Optional
-from dotenv import load_dotenv, find_dotenv
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+import re
+from functools import wraps
+from io import BytesIO
+import pyotp
+import qrcode
+import logging
 
 # Load environment variables from .env file
 load_dotenv()
-
-dotenv_path = find_dotenv()
-load_dotenv(dotenv_path)
 
 # Debug function to print environment variables
 def print_env_variables():
@@ -64,6 +67,11 @@ def verify_recaptcha(response_token):
         print(f"Error verifying reCAPTCHA: {e}")
         return False
 
+limiter = Limiter(
+    get_remote_address,
+    default_limits=["200 per day", "50 per hour"]
+)
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object('config.Config')
@@ -77,7 +85,8 @@ def create_app():
     login_manager.init_app(app)
     bcrypt.init_app(app)
     migrate.init_app(app, db)
-    csrf.init_app(app)  
+    csrf.init_app(app)
+    limiter.init_app(app)  # Initialize limiter
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -86,6 +95,7 @@ def create_app():
     def inject_user():
         return dict(current_user=current_user)
 
+    app.context_processor(inject_user)
     register_routes(app)
 
     return app
@@ -106,6 +116,8 @@ def register_routes(app):
                 if user and bcrypt.check_password_hash(user.password, form.password.data):
                     login_user(user, remember=form.remember.data)
                     flash('Login successful.', 'success')
+                    if user.role == 'admin':
+                        return redirect(url_for('admin_dashboard'))
                     return redirect(url_for('dashboard'))
                 else:
                     flash('Login unsuccessful. Please check your username and password.', 'danger')
@@ -116,8 +128,6 @@ def register_routes(app):
             print("Form validation failed:", form.errors)  # Debug statement
             print("Form data:", form.data)  # Additional debug statement
         return render_template('login.html', title='Login', form=form)
-
-
 
     @app.route('/logout')
     def logout():
@@ -175,14 +185,12 @@ def register_routes(app):
 
         return render_template('registration.html', title='Reģistrēties', form=form, role=role, recaptcha_public_key=recaptcha_public_key)
 
-
-
-
     @app.route('/dashboard')
     @login_required
     def dashboard():
         user_ideas = Idea.query.filter_by(user_id=current_user.id).all()
-        return render_template('dashboard.html', ideas=user_ideas)
+        delete_form = DeleteIdeaForm()  # Instantiate the delete form
+        return render_template('dashboard.html', ideas=user_ideas, delete_form=delete_form)
 
     @app.route('/confirm/<token>')
     def confirm_email(token):
@@ -236,15 +244,19 @@ def register_routes(app):
 
     @app.route('/rang')
     def rang():
+        db.session.expire_all()  # Ensure the session is refreshed
         all_ideas = Idea.query.all()
-        like_form = LikeForm()  
-        return render_template('rang.html', ideas=all_ideas, form=like_form)
+        like_form = LikeForm()
+        delete_form = DeleteIdeaForm()  # Instantiate the delete form
+        return render_template('rang.html', ideas=all_ideas, form=like_form, delete_form=delete_form)
+
 
     @app.route('/ideas')
     @login_required
     def ideas():
         all_ideas = Idea.query.all()
-        return render_template('ideas.html', ideas=all_ideas)
+        delete_form = DeleteIdeaForm() 
+        return render_template('ideas.html', ideas=all_ideas, delete_form=delete_form)
     
     @app.route('/edit_idea/<int:idea_id>', methods=['GET', 'POST'])
     @login_required
@@ -261,17 +273,16 @@ def register_routes(app):
             existing_options = {option.id: option for option in idea.voting_options}
 
             # Update existing options or add new ones
-            for option_form in form.voting_options:
-                if option_form.option_text.data:
-                    if option_form.id.data in existing_options:
-                        existing_options[option_form.id.data].option_text = option_form.option_text.data
-                    else:
-                        new_option = VotingOption(option_text=option_form.option_text.data, idea_id=idea.id)
-                        db.session.add(new_option)
+            for option_form in form.voting_options.entries:
+                if option_form.id.data and int(option_form.id.data) in existing_options:
+                    existing_options[int(option_form.id.data)].option_text = option_form.option_text.data
+                else:
+                    new_option = VotingOption(option_text=option_form.option_text.data, idea_id=idea.id)
+                    db.session.add(new_option)
 
             # Remove deleted options
             for option_id, option in existing_options.items():
-                if option_id not in [opt.id.data for opt in form.voting_options]:
+                if option_id not in [int(opt.id.data) for opt in form.voting_options.entries]:
                     db.session.delete(option)
 
             db.session.commit()
@@ -282,7 +293,6 @@ def register_routes(app):
 
 
 
-
     @app.route('/delete_idea/<int:idea_id>', methods=['POST'])
     @login_required
     def delete_idea(idea_id):
@@ -290,13 +300,16 @@ def register_routes(app):
         if idea.user_id != current_user.id:
             abort(403)
         try:
+            logging.info(f'Deleting idea with ID: {idea_id}')
             db.session.delete(idea)
             db.session.commit()
+            logging.info(f'Successfully deleted idea with ID: {idea_id}')
             flash('Jūsu ideja ir dzēsta!', 'success')
         except Exception as e:
             db.session.rollback()
+            logging.error(f'Error deleting idea with ID: {idea_id} - {e}')
             flash(f'Kļūda, dzēšot ideju: {e}', 'danger')
-        return redirect(url_for('ideas'))
+        return redirect(url_for('dashboard'))
 
     @app.route('/like_idea/<int:idea_id>', methods=['POST'])
     @login_required
@@ -484,11 +497,170 @@ def register_routes(app):
             flash(f'Kļūda, dzēšot jūsu komentāru: {e}', 'danger')
 
         return redirect(url_for('view_idea', idea_id=comment.idea_id))
+    
+    @app.route('/admin_dashboard')
+    @login_required
+    @role_required('admin')
+    def admin_dashboard():
+        users = User.query.all()
+        ideas = Idea.query.all()
+        return render_template('admin_dashboard.html', users=users, ideas=ideas)
+        
+    def log_action(user_id, action):
+        log = AuditLog(user_id=user_id, action=action)
+        db.session.add(log)
+        db.session.commit()
+
+    @app.route('/delete_user/<int:user_id>', methods=['POST'])
+    @login_required
+    @role_required('admin')
+    def delete_user(user_id):
+        user = User.query.get_or_404(user_id)
+        db.session.delete(user)
+        db.session.commit()
+        flash('User has been deleted.', 'success')
+        log_action(current_user.id, f'Deleted user {user_id}')
+        return redirect(url_for('admin_dashboard'))
+
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        return jsonify(error="ratelimit exceeded", message="Too many requests, please try again later."), 429
+        
+    def get_user_limit():
+        if current_user.is_authenticated and current_user.role == 'admin':
+            return "1000 per day"
+        return "200 per day"
+        
+    @app.route('/submit_comment', methods=['POST'])
+    @limiter.limit("10 per minute")
+    @login_required
+    def submit_comment():
+        content = request.form.get('content')
+        # Process the comment submission...
+        flash('Comment submitted successfully!', 'success')
+        return redirect(url_for('view_idea'))
+
+    @app.route('/dynamic_limit')
+    @limiter.limit(get_user_limit)
+    def dynamic_limit_route():
+        return "This route has dynamic rate limits based on user roles."
+        
+    @app.route('/reset_password', methods=['GET', 'POST'])
+    def reset_request():
+        if current_user.is_authenticated:
+            return redirect(url_for('home'))
+        form = RequestResetForm()
+        if form.validate_on_submit():
+            user = User.query.filter_by(email=form.email.data).first()
+            if user:
+                token = generate_confirmation_token(user.email)
+                reset_url = url_for('reset_token', token=token, _external=True)
+                html = render_template('reset_password.html', reset_url=reset_url)
+                send_email('Password Reset Request', user.email, html)
+                flash('An email has been sent with instructions to reset your password.', 'info')
+            else:
+                flash('No account found with that email.', 'warning')
+            return redirect(url_for('login'))
+        return render_template('reset_request.html', form=form)
+
+    @app.route('/reset_password/<token>', methods=['GET', 'POST'])
+    def reset_token(token):
+        if current_user.is_authenticated:
+            return redirect(url_for('home'))
+        email = confirm_token(token)
+        if email is None:
+            flash('That is an invalid or expired token', 'warning')
+            return redirect(url_for('reset_request'))
+        form = ResetPasswordForm()
+        if form.validate_on_submit():
+            user = User.query.filter_by(email=email).first_or_404()
+            user.password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            db.session.commit()
+            flash('Your password has been updated!', 'success')
+            return redirect(url_for('login'))
+        return render_template('reset_token.html', form=form)
+
+def censor_content(text):
+    pattern = re.compile('|'.join(map(re.escape, CENSORED_WORDS)), re.IGNORECASE)
+    return pattern.sub(lambda m: '*' * len(m.group()), text)
+
+CENSORED_WORDS = [
+    'muļķis',  
+    'idiots',  
+    'stulbenis',  
+    'draņķis',  
+    'kretīns',  
+    'šķebinošs',  
+    'sūds',  
+    'dirsa',  
+    'pidars',  
+    'nolādēts',  
+    'sasodīts',  
+    'kuce',  
+    'vecene',  
+    'sūda',  
+]
+
+def censor_content(text):
+    pattern = re.compile('|'.join(map(re.escape, CENSORED_WORDS)), re.IGNORECASE)
+    return pattern.sub(lambda m: '*' * len(m.group()), text)
+
+def role_required(role):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if current_user.role != role:
+                abort(403)
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+    @app.before_request
+    def before_request():
+        if current_user.is_authenticated:
+            app.logger.info(f'User {current_user.username} accessed {request.endpoint}')
+
+    @app.route('/enable_2fa', methods=['GET', 'POST'])
+    @login_required
+    def enable_2fa():
+        if request.method == 'POST':
+            secret = pyotp.random_base32()
+            current_user._2fa_secret = secret
+            db.session.commit()
+            flash('2FA enabled successfully.', 'success')
+            return redirect(url_for('dashboard'))
+        return render_template('enable_2fa.html')
+
+    @app.route('/qrcode')
+    @login_required
+    def qrcode_view():
+        if not current_user._2fa_secret:
+            abort(404)
+        totp = pyotp.TOTP(current_user._2fa_secret)
+        img = qrcode.make(totp.provisioning_uri(current_user.email, issuer_name="YourApp"))
+        buf = BytesIO()
+        img.save(buf)
+        buf.seek(0)
+        return send_file(buf, mimetype='image/png')
+
+    @app.route('/verify_2fa', methods=['POST'])
+    @login_required
+    def verify_2fa():
+        token = request.form.get('token')
+        totp = pyotp.TOTP(current_user._2fa_secret)
+        if totp.verify(token):
+            flash('2FA verification successful.', 'success')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid 2FA token.', 'danger')
+            return redirect(url_for('enable_2fa'))
 
 app = create_app()
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
 
 
 

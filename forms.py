@@ -1,11 +1,7 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, RadioField, EmailField, TextAreaField, BooleanField, HiddenField
-from wtforms.validators import DataRequired, Length, EqualTo, Email, Optional, ValidationError#
-from models import User
-from wtforms import StringField, TextAreaField, FieldList, FormField, SubmitField
-from flask_wtf import RecaptchaField
-import re
-from flask import flash
+from flask_wtf import FlaskForm, RecaptchaField
+from wtforms import StringField, PasswordField, SubmitField, SelectField, RadioField, EmailField, TextAreaField, BooleanField, HiddenField, FieldList, FormField
+from wtforms.validators import DataRequired, Length, EqualTo, Email, Optional, ValidationError
+
 
 class RegistrationForm(FlaskForm):
     username = StringField('Lietotājvārds', [
@@ -38,9 +34,10 @@ class RegistrationForm(FlaskForm):
             flash('Parolei jābūt vismaz vienam simbolam.', 'danger')
             raise ValidationError('Parolei jābūt vismaz vienam simbolam.')
 
-            
 class VotingOptionForm(FlaskForm):
+    id = HiddenField('id')
     option_text = StringField('Option', validators=[DataRequired()])
+
 
 class CommentForm(FlaskForm):
     content = TextAreaField('Comment', validators=[DataRequired(), Length(min=5, max=200)])
@@ -72,8 +69,6 @@ class LoginForm(FlaskForm):
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
-
-
 class IdeaForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired()])
@@ -89,11 +84,9 @@ class IdeaForm(FlaskForm):
         ('Sabiedrības drošība', 'Sabiedrības drošība'),
         ('Ekonomiskā attīstība', 'Ekonomiskā attīstība'),
         ('Atpūta', 'Atpūta')
-
     ], validators=[DataRequired()])
     voting_options = FieldList(FormField(VotingOptionForm), min_entries=1, max_entries=5)
     submit = SubmitField('Submit Idea')
-
 
 class DeleteIdeaForm(FlaskForm):
     submit = SubmitField('Delete')
@@ -112,6 +105,19 @@ class ChangePasswordForm(FlaskForm):
     new_password = PasswordField('New Password', validators=[DataRequired()])
     confirm_new_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('new_password')])
     submit = SubmitField('Change Password')
+
+class RequestResetForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired()])
+    submit = SubmitField('Reset Password')
+
+class AuditLogForm(FlaskForm):
+    search = StringField('Search Logs', validators=[DataRequired()])
+    submit = SubmitField('Search')
+
 
 
 
