@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import StringField, PasswordField, SubmitField, SelectField, RadioField, EmailField, TextAreaField, BooleanField, HiddenField, FieldList, FormField
 from wtforms.validators import DataRequired, Length, EqualTo, Email, Optional, ValidationError
+from flask import flash
+import re
 
 
 class RegistrationForm(FlaskForm):
