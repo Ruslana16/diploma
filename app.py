@@ -22,6 +22,7 @@ from io import BytesIO
 import pyotp
 import qrcode
 import logging
+from redis import Redis
 
 # Load environment variables from .env file
 load_dotenv()
@@ -67,14 +68,7 @@ def verify_recaptcha(response_token):
         print(f"Error verifying reCAPTCHA: {e}")
         return False
 
-    app.config['REDIS_URL'] = os.getenv('REDIS_URL')
-    redis_client = Redis.from_url(app.config['REDIS_URL'])
 
-    limiter = Limiter(
-        get_remote_address,
-        app=app,
-        storage_uri=app.config['REDIS_URL']
-    )
 
 def create_app():
     app = Flask(__name__)
@@ -90,7 +84,16 @@ def create_app():
     bcrypt.init_app(app)
     migrate.init_app(app, db)
     csrf.init_app(app)
-    limiter.init_app(app)  # Initialize limiter
+
+    app.config['REDIS_URL'] = os.getenv('REDIS_URL')
+    redis_client = Redis.from_url(app.config['REDIS_URL'])
+
+    limiter = Limiter(
+        get_remote_address,
+        app=app,
+        storage_uri=app.config['REDIS_URL']
+    )
+
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -536,20 +539,7 @@ def register_routes(app):
         if current_user.is_authenticated and current_user.role == 'admin':
             return "1000 per day"
         return "200 per day"
-        
-    @app.route('/submit_comment', methods=['POST'])
-    @limiter.limit("10 per minute")
-    @login_required
-    def submit_comment():
-        content = request.form.get('content')
-        # Process the comment submission...
-        flash('Comment submitted successfully!', 'success')
-        return redirect(url_for('view_idea'))
-
-    @app.route('/dynamic_limit')
-    @limiter.limit(get_user_limit)
-    def dynamic_limit_route():
-        return "This route has dynamic rate limits based on user roles."
+    
         
     @app.route('/reset_password', methods=['GET', 'POST'])
     def reset_request():
