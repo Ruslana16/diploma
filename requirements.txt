@@ -32,6 +32,7 @@ pyotp==2.9.0
 pypng==0.20220715.0
 python-dotenv==1.0.1
 qrcode==7.4.2
+redis==5.0.6
 rich==13.7.1
 SQLAlchemy==2.0.30
 typing_extensions==4.12.1

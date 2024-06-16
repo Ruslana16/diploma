@@ -67,10 +67,14 @@ def verify_recaptcha(response_token):
         print(f"Error verifying reCAPTCHA: {e}")
         return False
 
-limiter = Limiter(
-    get_remote_address,
-    default_limits=["200 per day", "50 per hour"]
-)
+    app.config['REDIS_URL'] = os.getenv('REDIS_URL')
+    redis_client = Redis.from_url(app.config['REDIS_URL'])
+
+    limiter = Limiter(
+        get_remote_address,
+        app=app,
+        storage_uri=app.config['REDIS_URL']
+    )
 
 def create_app():
     app = Flask(__name__)
