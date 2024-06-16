@@ -26,8 +26,8 @@ class Idea(db.Model):
     user = db.relationship('User', backref=db.backref('ideas', lazy=True))
     likes = db.relationship('Like', backref='idea', lazy=True)
     comments = db.relationship('Comment', backref='parent_idea', lazy=True)
-    idea_votes = db.relationship('Vote', backref='parent_idea_votes', lazy=True, overlaps="parent_idea_votes")
-    voting_options = db.relationship('VotingOption', backref='idea', lazy=True, cascade="all, delete-orphan")
+    idea_votes = db.relationship('Vote', backref='parent_idea_votes', lazy=True, overlaps="parent_idea_votes,idea_votes")
+    voting_options = db.relationship('VotingOption', backref='idea', lazy=True, cascade="all, delete-orphan", overlaps="idea,voting_option")
 
     def __repr__(self):
         return f"<Idea {self.title}>"
@@ -56,19 +56,19 @@ class Comment(db.Model):
 
     def __repr__(self):
         return f"<Comment {self.content[:20]}>"
-
+    
 class VotingOption(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     option_text = db.Column(db.String(100), nullable=False)
     votes = db.Column(db.Integer, default=0)
-    idea_id = db.Column(db.Integer, db.ForeignKey('idea.id'), nullable=False, overlaps="option_votes,voting_option")
+    idea_id = db.Column(db.Integer, db.ForeignKey('idea.id'), nullable=False)
     option_votes = db.relationship('Vote', backref='voting_option', lazy=True, overlaps="option_votes,voting_option")
 
 class Vote(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    idea_id = db.Column(db.Integer, db.ForeignKey('idea.id'), nullable=False, overlaps="idea_votes,parent_idea_votes")
-    option_id = db.Column(db.Integer, db.ForeignKey('voting_option.id'), nullable=False, overlaps="option_votes,voting_option")
+    idea_id = db.Column(db.Integer, db.ForeignKey('idea.id'), nullable=False)
+    option_id = db.Column(db.Integer, db.ForeignKey('voting_option.id'), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref='user_votes')
@@ -82,6 +82,7 @@ class AuditLog(db.Model):
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref='audit_logs')
+
 
 
 
