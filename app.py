@@ -264,6 +264,7 @@ def register_routes(app):
         idea = Idea.query.get_or_404(idea_id)
         if idea.user_id != current_user.id:
             abort(403)
+
         form = IdeaForm(obj=idea)
         if form.validate_on_submit():
             idea.title = form.title.data
@@ -290,6 +291,7 @@ def register_routes(app):
             return redirect(url_for('dashboard'))
 
         return render_template('edit_idea.html', form=form, idea=idea)
+
 
 
 
